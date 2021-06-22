@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern Matching</title>
+    <style>
+        .gamearea{
+            height: 200px;
+            width: 200px;
+            border: 1px solid black;
+        }
+        .box{
+            width: 50%;
+            height: 50%;
+            text-align: center;
+            display: inline-block;
+        }
+        .active{
+            border: 1px solid red;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="massage">Press Start Button</div>
+    <div class="gamearea"></div>
+    <button type="button" >Start</button>
+    <script>
+            const massage = document.querySelector('.massage');
+            const gameArea = document.querySelector('.gamearea');
+            const button = document.querySelector('button');
+
+            const gameColor=['red','blue','green','yellow'];
+            let userClickes=[];
+            let gameClicks=[];
+            let ifPlay=false;
+            playNumber =2;
+
+            // runComputer()
+
+            function runSequence(num){
+                const squares = document.querySelectorAll('.box');
+                num--;
+                if(num < 0 ){
+                    ifPlay = true;
+                    return;
+                }
+                const randomSequnce = Math.floor(Math.random() * squares.length);
+                gameClicks.push(gameColor[randomSequnce]);
+                squares[randomSequnce].style.opacity = '1';
+                setTimeout(()=>{
+                    squares[randomSequnce].style.opacity = '0.5';
+                    setTimeout(()=>{
+                        runSequence(num);
+                    },100)
+                },500)
+                
+            }
+            function endGame(){
+                button.disabled = false;
+                button.style.display = 'block';
+                if(gameClicks.toString() == userClickes.toString()){
+                    playNumber++;
+                    massage.textContent = 'Guessed Correct Go on To Harder One';
+                    console.log('Correct');
+                }else{
+                    massage.textContent = 'Guessed Wrong try again';
+                }
+            }
+            function checkAnswer(event){
+                
+                if(ifPlay){
+                const selectedColor = event.target;
+                userClickes.push(selectedColor.myColor);
+                selectedColor.style.opacity = '1';
+                setTimeout(()=>{
+                    selectedColor.style.opacity = '0.5';
+                },500);
+                console.log(userClickes);
+                }
+                if(userClickes.length == gameClicks.length){
+                    ifPlay = false 
+                    endGame();
+                }
+
+            }
+
+            function elementFactory(type){
+                const element = document.createElement(type);
+                return element;
+            }
+
+            function setUp(){
+                console.log('page loaded');
+                for(let x=0;x<gameColor.length;x++){
+                    const div = elementFactory('div');
+                    div.style.backgroundColor= gameColor[x];
+                    div.classList.add('box');
+                    div.style.opacity='0.5';
+                    div.myColor = gameColor[x];
+                    div.addEventListener('click',checkAnswer);
+                    gameArea.appendChild(div);
+                }
+                
+            }
+
+            button.addEventListener('click',()=>{
+                console.log('Was clicked');
+                if(!ifPlay){
+                    button.disabled =true;
+                    button.style.display = 'none';
+                    userClickes = [];
+                    gameClicks = [];
+                    runSequence(playNumber);
+                    // runComputer();
+                }
+            });
+            window.addEventListener('load',setUp);
+    </script>
+</body>
+</html>
